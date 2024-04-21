@@ -1,0 +1,38 @@
+(set-logic QF_BV)
+(set-option :produce-models true)
+
+(declare-const x1 (_ BitVec 4))
+(declare-const x2 (_ BitVec 4))
+(declare-const y1 (_ BitVec 4))
+(declare-const y2 (_ BitVec 4))
+(assert (= x1 #b0011))
+(assert (= x2 #b0101))
+(assert (= y1 #b0100))
+(assert (= y2 #b0110))
+
+(declare-const t1 (_ BitVec 4))
+(declare-const t2 (_ BitVec 4))
+(declare-const q1 (_ BitVec 4))
+(declare-const q2 (_ BitVec 4))
+(declare-const q3 (_ BitVec 4))
+(declare-const q4 (_ BitVec 4))
+(assert (or (= q1 x1) (= q1 x2)))
+(assert (or (= q2 x1) (= q2 x2)))
+(assert (or (= q3 x1) (= q3 x2) (= q3 t1)))
+(assert (or (= q4 x1) (= q4 x2) (= q4 t1)))
+
+(declare-const gt1 (_ BitVec 4))
+(declare-const gt2 (_ BitVec 4))
+(assert (or (= gt1 #b0110) (= gt1 #b0001) ) )
+(assert (or (= gt2 #b0110) (= gt2 #b0001) ) )
+
+(assert (= (bvxor (bvxor (bvxor (ite (bvult ((_ extract 0 0) gt1) #b1) #b0000 (bvand q1 q2)) (ite (bvult ((_ extract 1 1) gt1) #b1) #b0000 q2)) (ite (bvult ((_ extract 2 2) gt1) #b1) #b0000 q1)) (ite (bvult ((_ extract 3 3) gt1) #b1) #b0000 #b1111)) t1))
+(assert (= (bvxor (bvxor (bvxor (ite (bvult ((_ extract 0 0) gt2) #b1) #b0000 (bvand q3 q4)) (ite (bvult ((_ extract 1 1) gt2) #b1) #b0000 q4)) (ite (bvult ((_ extract 2 2) gt2) #b1) #b0000 q3)) (ite (bvult ((_ extract 3 3) gt2) #b1) #b0000 #b1111)) t2))
+
+(assert (or (= y1 t1) (= y1 t2)))
+(assert (or (= y2 t1) (= y2 t2)))
+
+(check-sat)
+(get-model)
+(get-value (x1 ))
+(exit)
