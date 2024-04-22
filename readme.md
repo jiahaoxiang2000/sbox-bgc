@@ -4,9 +4,9 @@ Utilize the SMT, also known as a constraint solver, to decipher the s-box, a com
 
 ## Environment
 
-for the Bitwuzla, the detail install guide is in the [install](https://bitwuzla.github.io/docs/install.html).
+For Bitwuzla, a detailed installation guide can be found at the [installation page](https://bitwuzla.github.io/docs/install.html).
 
-for more easy to use, we use the Python Bindings.
+To make it easier to use, we utilize the Python Bindings.
 
 ```bash
 # Clone Bitwuzla repository
