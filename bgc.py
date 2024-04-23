@@ -124,11 +124,12 @@ for i in range(bits):
     bitwuzla.assert_formula(tm.mk_term(Kind.OR, ts_temp))
 
 assertions = bitwuzla.get_assertions()
-print("Assertions:")
-print("{")
-for a in assertions:
-    print(f" {a}")
-print("}")
+with open("output.txt", "w") as f:
+    print("Assertions:", file=f)
+    print("{", file=f)
+    for a in assertions:
+        print(f" {a}", file=f)
+    print("}", file=f)
 
 if __name__ == "__main__":
     # Check the assertions
@@ -136,8 +137,9 @@ if __name__ == "__main__":
     print("Result:", result)
     if result == Result.SAT:
         model = bitwuzla.get_model()
-        print("Model:")
-        print("{")
-        for d in model.decls():
-            print(f" {d.name()} -> {model.get_value(d)}")
-        print("}")
+        with open("output.txt", "w") as f:
+            print("Model:", file=f)
+            print("{", file=f)
+            for d in model.decls():
+                print(f" {d.name()} -> {model.get_value(d)}", file=f)
+            print("}", file=f)
