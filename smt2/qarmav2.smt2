@@ -180,4 +180,5 @@
 (assert (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (= y2 t0) (= y2 t1)) (= y2 t2)) (= y2 t3)) (= y2 t4)) (= y2 t5)) (= y2 t6)) (= y2 t7)) (= y2 t8)) (= y2 t9)) (= y2 t10)) (= y2 t11)) (= y2 t12)) (= y2 t13)) (= y2 t14)) (= y2 t15)) (= y2 t16)) (= y2 t17)) (= y2 t18)) (= y2 t19)))
 (assert (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (= y3 t0) (= y3 t1)) (= y3 t2)) (= y3 t3)) (= y3 t4)) (= y3 t5)) (= y3 t6)) (= y3 t7)) (= y3 t8)) (= y3 t9)) (= y3 t10)) (= y3 t11)) (= y3 t12)) (= y3 t13)) (= y3 t14)) (= y3 t15)) (= y3 t16)) (= y3 t17)) (= y3 t18)) (= y3 t19)))
 (check-sat)
+(get-model)
 (exit)

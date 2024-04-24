@@ -35,5 +35,5 @@
 
 (check-sat)
 (get-model)
-(get-value (x0 ))
+
 (exit)
