@@ -5,7 +5,7 @@ import time
 start_time = time.time()
 
 with open("output.txt", "w") as f:
-    order = "stp --SMTLIB2 ./smt2/qarmav2.smt2 --threads 30 --cryptominisat  -n"
+    order = "stp --SMTLIB2 ./smt2/qarmav2_inverse.smt2 --threads 30 --cryptominisat  -n"
     s = os.popen(order).read()
     f.write(s)
 
