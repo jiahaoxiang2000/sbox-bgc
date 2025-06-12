@@ -9,26 +9,47 @@ For Bitwuzla, a detailed installation guide can be found at the [installation pa
 To make it easier to use, we utilize the Python Bindings.
 
 ```bash
-# Create and activate virtual environment with uv
-uv venv
+# Create and activate virtual environment with uv using Python 3.10
+uv venv --python 3.10
 source .venv/bin/activate
 
 # Initialize and update git submodules (including Bitwuzla)
 git submodule update --init --recursive
 
-# Alternatively, if you need to manually clone:
-cd bitwuzla
-
-# have some dependencies on ubuntu 22.04
+# Install system dependencies on Ubuntu 22.04
+# GMP (GNU Multi-Precision arithmetic library) is required
 sudo apt-get install -y libgmp-dev
 
+# Install Python build dependencies (as specified in install.rst)
+uv pip install "cython>=3.0.0"
 uv pip install meson-python
-uv pip install Cython
- 
+
 # Build and install Bitwuzla Python bindings
+cd bitwuzla
 uv pip install .
-# note the install progress need to git fetch from github, for its dependencies.
+cd ..
+
+# Note: The build system will automatically download and build CaDiCaL and SymFPU
+# if they are not found, as mentioned in the installation documentation.
 ```
+
+### Required Dependencies
+
+Based on install.rst, the following are required:
+
+* **System Dependencies:**
+  - Python >= 3.7
+  - Meson >= 0.64
+  - Ninja
+  - GMP >= v6.1 (GNU Multi-Precision arithmetic library)
+
+* **Python Dependencies:**
+  - cython >= 3.0.0
+  - meson-python
+
+* **Auto-downloaded Dependencies:**
+  - CaDiCaL >= 1.5.0 (automatically downloaded if not found)
+  - SymFPU (automatically downloaded if not found)
 
 ## The SMT of Bitwuzla 
 
