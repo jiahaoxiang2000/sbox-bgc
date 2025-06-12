@@ -9,18 +9,24 @@ For Bitwuzla, a detailed installation guide can be found at the [installation pa
 To make it easier to use, we utilize the Python Bindings.
 
 ```bash
-# Clone Bitwuzla repository
-git clone https://github.com/bitwuzla/bitwuzla
+# Create and activate virtual environment with uv
+uv venv
+source .venv/bin/activate
+
+# Initialize and update git submodules (including Bitwuzla)
+git submodule update --init --recursive
+
+# Alternatively, if you need to manually clone:
 cd bitwuzla
 
 # have some dependencies on ubuntu 22.04
 sudo apt-get install -y libgmp-dev
 
-pip install meson-python
-pip install Cython
+uv pip install meson-python
+uv pip install Cython
  
 # Build and install Bitwuzla Python bindings
-pip install .
+uv pip install .
 # note the install progress need to git fetch from github, for its dependencies.
 ```
 
