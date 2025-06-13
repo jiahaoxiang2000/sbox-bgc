@@ -1,0 +1,50 @@
+=== Boolean Circuit Formula ===
+Source: test-s2_d_4_2_1_4_3.txt
+Format: human
+
+=== Gate Equivalent (GE) Cost Analysis ===
+Technology: UMC 180nm
+Total Gates: 10
+Total GE Cost: 12.999999999999998
+
+Gate Count by Type:
+  AND: 1
+  NAND: 1
+  NOR: 4
+  NOT: 2
+  XOR: 2
+
+Detailed Gate Costs:
+  Gate 0: NOT (0x09) = 0.6666666666666666 GE
+  Gate 1: NOT (0x09) = 0.6666666666666666 GE
+  Gate 2: NAND (0x05) = 1.0 GE
+  Gate 3: AND (0x04) = 1.3333333333333333 GE
+  Gate 4: NOR (0x07) = 1.0 GE
+  Gate 5: NOR (0x07) = 1.0 GE
+  Gate 6: NOR (0x07) = 1.0 GE
+  Gate 7: XOR (0x02) = 2.6666666666666665 GE
+  Gate 8: NOR (0x07) = 1.0 GE
+  Gate 9: XOR (0x02) = 2.6666666666666665 GE
+
+Variable Assignments:
+  B: ['09', '09', '05', '04', '07', '07', '07', '02', '07', '02']
+  Q: ['0F', '0F', '55', '0F', '33', '33', '55', '55', '55', 'F0', '33', 'CC', 'AF', 'CC', '55', 'AF', '55', 'CC', 'F0', 'F0', 'AF', 'CC', 'AF', 'AF', '33', 'F0', 'AF', 'AF', '55', '0C', '55', '22', '8C', '10', '0F', 'CC', '0F', '22', '8C', 'CC']
+  Y: ['2D', '63', '59']
+  C: ['02', '02', '03', '04', '03', '03', '03', '08', '03', '08']
+  T: ['F0', 'CC', 'AF', '8C', '22', '10', '0C', '59', '63', '2D']
+  X: ['0F', '33', '55']
+
+Circuit Formulas:
+  T0 = NOT X_0
+  T1 = NOT X_1
+  T2 = X_2 NAND T_0
+  T3 = T_2 AND T_1
+  T4 = X_2 NOR T_1
+  T5 = T_2 NOR T_1
+  T6 = X_1 NOR T_0
+  T7 = X_2 XOR T_6
+  T8 = T_3 NOR T_5
+  T9 = X_0 XOR T_4
+  Y0 = T9
+  Y1 = T8
+  Y2 = T7
