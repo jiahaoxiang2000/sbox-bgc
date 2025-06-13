@@ -145,6 +145,7 @@ Output:
 Solver:
   --stp-path PATH      Path to STP executable (default: stp)
   --timeout SECONDS    Solver timeout (default: 300)
+  --threads NUM        Number of threads for STP solver (default: 20)
 
 Logging:
   --log-level LEVEL    DEBUG, INFO, WARNING, ERROR (default: INFO)
@@ -159,7 +160,7 @@ Logging:
 from gec_solver import GECOptimizer
 
 # Initialize optimizer
-optimizer = GECOptimizer(bit_num=3, stp_path="stp", log_level="INFO")
+optimizer = GECOptimizer(bit_num=3, stp_path="stp", log_level="INFO", threads=20)
 
 # Define S-box
 sbox = [0x0, 0x1, 0x3, 0x6, 0x7, 0x4, 0x5, 0x2]
@@ -360,6 +361,44 @@ optimizer = GECOptimizer(bit_num=3, log_level="DEBUG")
    - **Structure Exploration**: Tests all depth structures before trying fewer gates
 3. **Structure Filtering**: Validates depth structures before solving
 4. **Parallel Solving**: Uses STP's multi-threading capabilities
+
+### STP Thread Configuration
+
+The solver uses STP's built-in multi-threading support to improve performance. You can control the number of threads used:
+
+#### Command Line Interface
+
+```bash
+# Use 8 threads for STP solver
+python gec_cli.py --sbox "0,1,3,6,7,4,5,2" --bit-num 3 --threads 8
+
+# Use 1 thread (sequential execution)
+python gec_cli.py --sbox "0,1,3,6,7,4,5,2" --bit-num 3 --threads 1
+
+# Use maximum available threads (default: 20)
+python gec_cli.py --sbox "0,1,3,6,7,4,5,2" --bit-num 3 --threads 32
+```
+
+#### Python API
+
+```python
+# Initialize with custom thread count
+optimizer = GECOptimizer(bit_num=3, threads=8)
+
+# Initialize with sequential execution
+optimizer = GECOptimizer(bit_num=3, threads=1)
+
+# Access thread count
+print(f"Using {optimizer.threads} threads")
+```
+
+#### Performance Guidelines
+
+- **Default (20 threads)**: Good balance for most systems
+- **High CPU count systems**: Use more threads (32, 64)
+- **Low-memory systems**: Use fewer threads (4, 8)
+- **Sequential debugging**: Use 1 thread for reproducible results
+- **STP arguments**: Threads are passed as `--threads N` to STP solver
 
 ### Typical Performance
 

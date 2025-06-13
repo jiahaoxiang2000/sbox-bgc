@@ -18,7 +18,13 @@ class GECOptimizer:
     Main class for S-box GEC optimization.
     """
 
-    def __init__(self, bit_num: int, stp_path: str = "stp", log_level: str = "INFO"):
+    def __init__(
+        self,
+        bit_num: int,
+        stp_path: str = "stp",
+        log_level: str = "INFO",
+        threads: int = 20,
+    ):
         """
         Initialize GEC optimizer.
 
@@ -26,8 +32,10 @@ class GECOptimizer:
             bit_num: Number of bits for S-box
             stp_path: Path to STP executable
             log_level: Logging level
+            threads: Number of threads for STP solver
         """
         self.bit_num = bit_num
+        self.threads = threads
         self.logger = setup_logging(log_level)
 
         # Initialize components
@@ -36,7 +44,9 @@ class GECOptimizer:
         self.cvc_generator = CVCGenerator(self.sbox_converter, self.gate_library)
         self.stp_solver = STPSolver(stp_path)
 
-        self.logger.info(f"Initialized GEC optimizer for {bit_num}-bit S-boxes")
+        self.logger.info(
+            f"Initialized GEC optimizer for {bit_num}-bit S-boxes (threads: {threads})"
+        )
 
     def generate_depth_combinations(
         self, gate_num: int, max_depth: int
@@ -277,7 +287,8 @@ class GECOptimizer:
         # Solve with STP
         self.logger.debug(f"Solving structure: {structure}")
         solver_result = self.stp_solver.solve_with_script(
-            cvc_file, additional_args=["--cryptominisat", "--threads", "20"]
+            cvc_file,
+            additional_args=["--cryptominisat", "--threads", str(self.threads)],
         )
 
         # Save detailed result

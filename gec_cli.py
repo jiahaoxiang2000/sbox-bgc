@@ -72,6 +72,9 @@ Examples:
   # Use specific technology and gates
   python gec_cli.py --sbox "[0,1,3,6,7,4,5,2]" --bit-num 3 --technology 1 --gates "XOR,AND,OR"
 
+  # Use 8 threads for STP solver
+  python gec_cli.py --sbox "0,1,3,6,7,4,5,2" --bit-num 3 --threads 8
+
   # Load S-box from file
   python gec_cli.py --sbox-file sbox.json --bit-num 3 --max-gec 50
 
@@ -151,6 +154,12 @@ Technologies: 0=UMC 180nm, 1=SMIC 130nm
         default=300,
         help="Solver timeout in seconds (default: 300)",
     )
+    parser.add_argument(
+        "--threads",
+        type=int,
+        default=20,
+        help="Number of threads for STP solver (default: 20)",
+    )
 
     # Logging options
     parser.add_argument(
@@ -211,7 +220,10 @@ Technologies: 0=UMC 180nm, 1=SMIC 130nm
 
         # Initialize optimizer
         optimizer = GECOptimizer(
-            bit_num=args.bit_num, stp_path=args.stp_path, log_level=log_level
+            bit_num=args.bit_num,
+            stp_path=args.stp_path,
+            log_level=log_level,
+            threads=args.threads,
         )
         optimizer.stp_solver.timeout = args.timeout
 
