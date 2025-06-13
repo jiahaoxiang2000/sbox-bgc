@@ -1,3 +1,6 @@
 [submodule "bitwuzla"]
 	path = bitwuzla
 	url = https://github.com/bitwuzla/bitwuzla
+[submodule "sbox-impl"]
+	path = sbox-impl
+	url = git@github.com:jiahaoxiang2000/Sboximplementation.git
