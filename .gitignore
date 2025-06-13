@@ -163,3 +163,4 @@ cython_debug/
 #.idea/
 
 gec/**
+gec_output/**
