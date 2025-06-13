@@ -2,7 +2,15 @@
 
 Utilize the SMT, also known as a constraint solver, to decipher the s-box, a component used in cryptography.
 
+## How to Work with Bitwuzla and STP
+
+> For the history of the project, the final solver used the [stp](https://github.com/stp/stp). Here, we use _Bitwuzla_ to construct the SMT problem, then use _STP_ to solve it, as Bitwuzla is a more modern and efficient solver for problem construction.
+
+So we first use _Bitwuzla_ to construct the SMT problem, then use _STP_ to solve it.
+
 ## Environment
+
+### Bitwuzla Installation
 
 For Bitwuzla, a detailed installation guide can be found at the [installation page](https://bitwuzla.github.io/docs/install.html).
 
@@ -33,24 +41,38 @@ cd ..
 # if they are not found, as mentioned in the installation documentation.
 ```
 
-### Required Dependencies
+### STP Installation
 
-Based on install.rst, the following are required:
+For STP solver installation, follow these steps:
 
-* **System Dependencies:**
-  - Python >= 3.7
-  - Meson >= 0.64
-  - Ninja
-  - GMP >= v6.1 (GNU Multi-Precision arithmetic library)
+```bash
+# Install system dependencies
+sudo apt-get install cmake bison flex libboost-all-dev python perl minisat
 
-* **Python Dependencies:**
-  - cython >= 3.0.0
-  - meson-python
+## install the minisat solver
 
-* **Auto-downloaded Dependencies:**
-  - CaDiCaL >= 1.5.0 (automatically downloaded if not found)
-  - SymFPU (automatically downloaded if not found)
+git clone https://github.com/stp/minisat
+cd minisat
+mkdir build && cd build
+cmake ..
+cmake --build .
+sudo cmake --install .
+command -v ldconfig && sudo ldconfig
 
-## The SMT of Bitwuzla 
+# Clone and build STP
+git clone https://github.com/stp/stp
+cd stp
+git submodule init && git submodule update
+./scripts/deps/setup-gtest.sh
+./scripts/deps/setup-outputcheck.sh
+./scripts/deps/setup-minisat.sh
+mkdir build
+cd build
+cmake ..
+cmake --build .
+sudo cmake --install .
+```
+
+## The SMT of Bitwuzla
 
 This document provides examples of using Bitwuzla, which can be found in the [Bitwuzla Documentation](https://bitwuzla.github.io/docs/python/api.html). These examples demonstrate how to use Bitwuzla to solve SMT problems effectively. Additionally, the Python interface allows us to leverage the capabilities that Bitwuzla offers.
