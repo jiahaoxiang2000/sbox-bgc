@@ -157,7 +157,7 @@ Logging:
 #### Basic Optimization (Default - Stops on First Solution)
 
 ```python
-from gec_solver import GECOptimizer
+from solver import GECOptimizer
 
 # Initialize optimizer
 optimizer = GECOptimizer(bit_num=3, stp_path="stp", log_level="INFO", threads=20)
@@ -234,7 +234,7 @@ for sol in results['solutions']:
 #### Custom Gate Library
 
 ```python
-from gec_solver import GateLibrary, GECOptimizer
+from solver import GateLibrary, GECOptimizer
 
 # Extend gate library
 gate_lib = GateLibrary()
@@ -327,7 +327,7 @@ output_dir/
 ### Enable Debug Logging
 
 ```python
-from gec_solver import setup_logging
+from solver import setup_logging
 
 # Setup detailed logging
 logger = setup_logging("DEBUG", "debug.log")

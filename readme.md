@@ -36,7 +36,7 @@ python gec_cli.py --sbox "0,1,3,6,7,4,5,2" --bit-num 3 --exact-gates 4
 #### Python API
 
 ```python
-from gec_solver import GECOptimizer
+from solver import GECOptimizer
 
 # Initialize optimizer
 optimizer = GECOptimizer(bit_num=3, stp_path="stp", threads=20)

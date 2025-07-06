@@ -12,7 +12,7 @@ from typing import List, Optional
 # Add the current directory to the path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from gec_solver import GECOptimizer, setup_logging
+from solver import GECOptimizer, setup_logging
 
 
 def parse_sbox(sbox_str: str) -> List[int]:

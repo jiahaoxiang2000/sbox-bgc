@@ -13,7 +13,7 @@ from typing import Dict, List, Optional, Any
 
 # Add parent directory to path to import gate_library
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
-from gec_solver.gate_library import GateLibrary
+from solver.gate_library import GateLibrary
 
 
 class FormulaGenerator:
