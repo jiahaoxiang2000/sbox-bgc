@@ -159,7 +159,7 @@ class BGCConstraintGenerator:
         current_q = count_q
         current_t = count_t
 
-        for k in range(gates_at_depth):
+        for _ in range(gates_at_depth):
             # Gate input selection constraints
             for q in range(2):
                 if depth == 0 or q == 0 or not parallel:
@@ -259,7 +259,7 @@ class BGCCircuitStructure:
                 results.append(current.copy())
             return
 
-        for i, val in enumerate(available):
+        for _, val in enumerate(available):
             if val <= remaining:
                 current.append(val)
                 self._combination_impl(
@@ -554,7 +554,10 @@ class BGCOptimizer:
 
         def solver_thread():
             try:
-                self._thread_result = self.stp_solver.solve_file(cvc_file)
+                self._thread_result = self.stp_solver.solve_with_script(
+                    cvc_file,
+                    additional_args=["--cryptominisat", "--threads", str(self.threads)],
+                )
             except Exception as e:
                 self.logger.error(f"Solver thread error: {e}")
 
