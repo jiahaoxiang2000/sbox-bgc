@@ -1,78 +1,82 @@
 ## Introduction
 
-Utilize the SMT, also known as a constraint solver, to decipher the s-box, a component used in cryptography.
+This project utilizes SMT (Satisfiability Modulo Theories) solvers, also known as constraint solvers, to analyze S-boxes, which are fundamental components used in cryptography.
 
-## How to Work with Bitwuzla and STP
+## Setup
 
-> For the history of the project, the final solver used the [stp](https://github.com/stp/stp). Here, we use _Bitwuzla_ to construct the SMT problem, then use _STP_ to solve it, as Bitwuzla is a more modern and efficient solver for problem construction.
+For detailed installation instructions for Bitwuzla and STP solvers, see [setup.md](setup.md).
 
-So we first use _Bitwuzla_ to construct the SMT problem, then use _STP_ to solve it.
+## GEC S-box Optimization
 
-## Environment
+This project includes a comprehensive GEC (Gate Equivalent Circuit) S-box optimization package that provides modular, well-structured tools for optimizing S-box implementations using constraint solvers.
 
-### Bitwuzla Installation
+### Key Features
 
-For Bitwuzla, a detailed installation guide can be found at the [installation page](https://bitwuzla.github.io/docs/install.html).
+- **Modular Design**: Separated concerns with distinct modules for gate libraries, S-box conversion, constraint generation, and optimization
+- **Multiple Search Strategies**: From quick optimization to exhaustive analysis
+- **Technology Support**: UMC 180nm and SMIC 130nm process technologies
+- **Comprehensive Logging**: Debug and trace the optimization process
+- **Flexible API**: Easy-to-use command line interface and Python API
 
-To make it easier to use, we utilize the Python Bindings.
+### Usage Examples
 
-```bash
-# Create and activate virtual environment with uv using Python 3.10
-uv venv --python 3.10
-source .venv/bin/activate
-
-# Initialize and update git submodules (including Bitwuzla)
-git submodule update --init --recursive
-
-# Install system dependencies on Ubuntu 22.04
-# GMP (GNU Multi-Precision arithmetic library) is required
-sudo apt-get install -y libgmp-dev
-
-# Install Python build dependencies (as specified in install.rst)
-uv pip install "cython>=3.0.0"
-uv pip install meson-python
-
-# Build and install Bitwuzla Python bindings
-cd bitwuzla
-uv pip install .
-cd ..
-
-# Note: The build system will automatically download and build CaDiCaL and SymFPU
-# if they are not found, as mentioned in the installation documentation.
-```
-
-### STP Installation
-
-For STP solver installation, follow these steps:
+#### Basic Optimization (Command Line)
 
 ```bash
-# Install system dependencies
-sudo apt-get install cmake bison flex libboost-all-dev python perl minisat
+# Find first solution for a 3-bit S-box
+python gec_cli.py --sbox "0,1,3,6,7,4,5,2" --bit-num 3 --max-gates 6
 
-## install the minisat solver
+# Find all solutions within constraints
+python gec_cli.py --sbox "0,1,3,6,7,4,5,2" --bit-num 3 --max-gates 6 --find-all
 
-git clone https://github.com/stp/minisat
-cd minisat
-mkdir build && cd build
-cmake ..
-cmake --build .
-sudo cmake --install .
-command -v ldconfig && sudo ldconfig
-
-# Clone and build STP
-git clone https://github.com/stp/stp
-cd stp
-git submodule init && git submodule update
-./scripts/deps/setup-gtest.sh
-./scripts/deps/setup-outputcheck.sh
-./scripts/deps/setup-minisat.sh
-mkdir build
-cd build
-cmake ..
-cmake --build .
-sudo cmake --install .
+# Find all solutions for exactly 4 gates
+python gec_cli.py --sbox "0,1,3,6,7,4,5,2" --bit-num 3 --exact-gates 4
 ```
 
-## The SMT of Bitwuzla
+#### Python API
 
-This document provides examples of using Bitwuzla, which can be found in the [Bitwuzla Documentation](https://bitwuzla.github.io/docs/python/api.html). These examples demonstrate how to use Bitwuzla to solve SMT problems effectively. Additionally, the Python interface allows us to leverage the capabilities that Bitwuzla offers.
+```python
+from gec_solver import GECOptimizer
+
+# Initialize optimizer
+optimizer = GECOptimizer(bit_num=3, stp_path="stp", threads=20)
+
+# Define S-box
+sbox = [0x0, 0x1, 0x3, 0x6, 0x7, 0x4, 0x5, 0x2]
+
+# Run optimization (stops on first solution)
+results = optimizer.optimize_sbox(
+    sbox=sbox,
+    max_gates=6,
+    max_gec=40,
+    technology=0,  # UMC 180nm
+    gate_list=["XOR", "AND", "OR", "NOT", "NAND", "NOR"],
+    output_dir="./results",
+    cipher_name="my_sbox"
+)
+
+# Access results
+if results["best_solution"]:
+    best = results["best_solution"]
+    print(f"Best solution: {best['gate_num']} gates, depth {best['depth']}")
+    print(f"Structure: {best['structure']}")
+```
+
+#### Search Strategies
+
+**Default Strategy**: Quick optimization that stops on the first valid solution
+
+- Use when you need fast results for practical implementation
+- Best for initial feasibility analysis
+
+**Exhaustive Search**: Find all possible solutions within constraints
+
+- Use for research and complete solution space analysis
+- Best for comparing all possible implementations
+
+**Exact Gate Analysis**: Find all solutions for a specific gate count
+
+- Use when you have specific hardware constraints
+- Best for comparing different structures with same resource usage
+
+For detailed documentation and advanced usage examples, see [example](example.md).
