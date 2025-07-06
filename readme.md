@@ -4,7 +4,7 @@ This project utilizes SMT (Satisfiability Modulo Theories) solvers, also known a
 
 ## Setup
 
-For detailed installation instructions for Bitwuzla and STP solvers, see [setup.md](setup.md).
+For detailed installation instructions for Bitwuzla and STP solvers, see [setup.md](docs/setup.md).
 
 ## GEC S-box Optimization
 
@@ -79,4 +79,4 @@ if results["best_solution"]:
 - Use when you have specific hardware constraints
 - Best for comparing different structures with same resource usage
 
-For detailed documentation and advanced usage examples, see [example](example.md).
+For detailed documentation and advanced usage examples, see [example.md](docs/example.md).
