@@ -6,21 +6,32 @@ This project utilizes SMT (Satisfiability Modulo Theories) solvers, also known a
 
 For detailed installation instructions for Bitwuzla and STP solvers, see [setup.md](docs/setup.md).
 
-## GEC S-box Optimization
+## S-box Optimization Framework
 
-This project includes a comprehensive GEC (Gate Equivalent Circuit) S-box optimization package that provides modular, well-structured tools for optimizing S-box implementations using constraint solvers.
+This project includes a comprehensive S-box optimization framework supporting multiple optimization methods:
+
+### **GEC (Gate Equivalent Circuit) Optimization**
+- Focus on minimizing gate equivalent cost using technology-specific models
+- Support for UMC 180nm and SMIC 130nm process technologies
+- Complex gate types (XOR3, MAOI1, MOAI1) for advanced optimization
+
+### **BGC (Boolean Gate Count) Optimization** 
+- Focus on minimizing the number of Boolean gates
+- Direct gate count optimization for hardware implementations
+- Simpler gate model with AND, NOT, XOR operations
 
 ### Key Features
 
 - **Modular Design**: Separated concerns with distinct modules for gate libraries, S-box conversion, constraint generation, and optimization
-- **Multiple Search Strategies**: From quick optimization to exhaustive analysis
-- **Technology Support**: UMC 180nm and SMIC 130nm process technologies
+- **Multiple Search Strategies**: From quick optimization to exhaustive analysis  
+- **Dual Optimization Methods**: Both GEC and BGC approaches available
+- **Multi-threading Support**: Parallel solver execution for improved performance
 - **Comprehensive Logging**: Debug and trace the optimization process
 - **Flexible API**: Easy-to-use command line interface and Python API
 
 ### Usage Examples
 
-#### Basic Optimization (Command Line)
+#### GEC Optimization (Command Line)
 
 ```bash
 # Find first solution for a 3-bit S-box
@@ -33,33 +44,54 @@ python gec_cli.py --sbox "0,1,3,6,7,4,5,2" --bit-num 3 --max-gates 6 --find-all
 python gec_cli.py --sbox "0,1,3,6,7,4,5,2" --bit-num 3 --exact-gates 4
 ```
 
+#### BGC Optimization (Command Line)
+
+```bash
+# Find minimal gate count for a 4-bit S-box (QARMAv2)
+python bgc_cli.py --sbox "4,7,9,11,12,6,14,15,0,5,1,13,8,3,2,10" --bit-num 4 --max-gates 20
+
+# Find all solutions within constraints
+python bgc_cli.py --sbox "4,7,9,11,12,6,14,15,0,5,1,13,8,3,2,10" --bit-num 4 --max-gates 15 --find-all
+
+# Use parallel optimization
+python bgc_cli.py --sbox "4,7,9,11,12,6,14,15,0,5,1,13,8,3,2,10" --bit-num 4 --max-gates 20 --parallel
+```
+
 #### Python API
 
 ```python
+# GEC Optimization
 from solver import GECOptimizer
 
-# Initialize optimizer
-optimizer = GECOptimizer(bit_num=3, stp_path="stp", threads=20)
-
-# Define S-box
-sbox = [0x0, 0x1, 0x3, 0x6, 0x7, 0x4, 0x5, 0x2]
-
-# Run optimization (stops on first solution)
-results = optimizer.optimize_sbox(
-    sbox=sbox,
+gec_optimizer = GECOptimizer(bit_num=3, stp_path="stp", threads=20)
+gec_results = gec_optimizer.optimize_sbox(
+    sbox=[0x0, 0x1, 0x3, 0x6, 0x7, 0x4, 0x5, 0x2],
     max_gates=6,
     max_gec=40,
     technology=0,  # UMC 180nm
     gate_list=["XOR", "AND", "OR", "NOT", "NAND", "NOR"],
-    output_dir="./results",
+    output_dir="./gec_results",
     cipher_name="my_sbox"
 )
 
+# BGC Optimization  
+from solver import BGCOptimizer
+
+bgc_optimizer = BGCOptimizer(bit_num=4, stp_path="stp", threads=20)
+bgc_results = bgc_optimizer.optimize_sbox(
+    sbox=[4, 7, 9, 11, 12, 6, 14, 15, 0, 5, 1, 13, 8, 3, 2, 10],
+    max_gates=20,
+    max_depth=5,
+    output_dir="./bgc_results", 
+    cipher_name="qarmav2",
+    stop_on_first=True
+)
+
 # Access results
-if results["best_solution"]:
-    best = results["best_solution"]
-    print(f"Best solution: {best['gate_num']} gates, depth {best['depth']}")
-    print(f"Structure: {best['structure']}")
+if bgc_results["best_solution"]:
+    best = bgc_results["best_solution"]
+    print(f"BGC solution: {best.gate_count} gates, depth {best.depth}")
+    print(f"Structure: {best.structure}")
 ```
 
 #### Search Strategies

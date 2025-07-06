@@ -14,6 +14,7 @@ from .cvc_generator import CVCGenerator
 from .stp_solver import STPSolver, SolverResult
 from .gate_library import GateLibrary
 from .gec_optimizer import GECOptimizer
+from .bgc_optimizer import BGCOptimizer, BGCResult
 from .utils import setup_logging, tobits
 
 __version__ = "1.0.0"
@@ -24,6 +25,8 @@ __all__ = [
     "SolverResult",
     "GateLibrary",
     "GECOptimizer",
+    "BGCOptimizer",
+    "BGCResult",
     "setup_logging",
     "tobits",
 ]

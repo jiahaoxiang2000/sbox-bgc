@@ -137,7 +137,7 @@ Search Strategy:
   --exact-gates N      Find all solutions for exactly N gates
 
 Output:
-  --output-dir DIR     Output directory (default: ./gec_output)
+  --output-dir DIR     Output directory (default: ./output_gec)
   --name NAME          Name for output files (default: sbox)
   --json-output        Output results in JSON format
   --quiet              Suppress progress output
@@ -471,8 +471,8 @@ Best solution:
   Depth: 2
   Structure: [2, 2]
   Execution time: 0.456s
-  CVC file: ./gec_output/sbox/sbox_d_2_2_2_0.cvc
-  Result file: ./gec_output/sbox/sbox_d_2_2_2_0.txt
+  CVC file: ./output_gec/sbox/sbox_d_2_2_2_0.cvc
+  Result file: ./output_gec/sbox/sbox_d_2_2_2_0.txt
 Execution time stats:
   Min: 0.123s
   Max: 1.234s
@@ -513,9 +513,9 @@ Solutions found: 2
 
 Solutions:
   1. Structure: [2, 2], Time: 0.456s
-     File: ./gec_output/sbox/sbox_d_2_2_2_0.cvc
+     File: ./output_gec/sbox/sbox_d_2_2_2_0.cvc
   2. Structure: [1, 3], Time: 0.623s
-     File: ./gec_output/sbox/sbox_d_2_1_3_0.cvc
+     File: ./output_gec/sbox/sbox_d_2_1_3_0.cvc
 ```
 
 ## License

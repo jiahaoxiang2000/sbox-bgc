@@ -134,8 +134,8 @@ Technologies: 0=UMC 180nm, 1=SMIC 130nm
     parser.add_argument(
         "--output-dir",
         type=str,
-        default="./gec_output",
-        help="Output directory (default: ./gec_output)",
+        default="./output_gec",
+        help="Output directory (default: ./output_gec)",
     )
     parser.add_argument(
         "--name", type=str, default="sbox", help="Name for output files (default: sbox)"

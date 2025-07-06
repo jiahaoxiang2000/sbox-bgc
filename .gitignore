@@ -163,5 +163,6 @@ cython_debug/
 #.idea/
 
 gec/**
-gec_output/**
+output_gec/**
+output_bgc/**
 stp/
