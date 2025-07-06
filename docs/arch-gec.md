@@ -5,6 +5,7 @@ This document describes the architecture of the Solver package for S-box optimiz
 ## Overview
 
 The Solver package is a modular Python package designed to optimize S-box implementations using multiple methods:
+
 - **GEC (Gate Equivalent Circuit)**: Finding minimal gate equivalent circuits using constraint satisfaction
 - **BGC (Boolean Gate Complexity)**: Optimizing boolean gate complexity (planned addition)
 
@@ -15,64 +16,66 @@ The package uses constraint satisfaction techniques with solvers like STP to fin
 ```mermaid
 graph TB
     %% User Interface Layer
-    CLI[gec_cli.py<br/>Command Line Interface]
-    API[Python API<br/>Direct Usage]
-    
+    CLI["gec_cli.py<br/>Command Line Interface"]
+    API["Python API<br/>Direct Usage"]
+
     %% Core Components
     subgraph "Solver Package"
-        GECOpt[GECOptimizer<br/>GEC Optimization]
-        BGCOpt[BGCOptimizer<br/>BGC Optimization<br/>(Planned)]
-        
+        GECOpt["GECOptimizer<br/>GEC Optimization"]
+        BGCOpt["BGCOptimizer<br/>BGC Optimization<br/>(Planned)"]
+
         subgraph "Input Processing"
-            SboxConverter[SboxConverter<br/>S-box Validation & Conversion]
+            SboxConverter["SboxConverter<br/>S-box Validation & Conversion"]
         end
-        
+
         subgraph "Problem Generation"
-            CVCGenerator[CVCGenerator<br/>Constraint Generation]
-            GateLibrary[GateLibrary<br/>Gate Definitions & Costs]
+            CVCGenerator["CVCGenerator<br/>Constraint Generation"]
+            GateLibrary["GateLibrary<br/>Gate Definitions & Costs"]
         end
-        
+
         subgraph "Solver Interface"
-            STPSolver[STPSolver<br/>STP Integration]
+            STPSolver["STPSolver<br/>STP Integration"]
         end
-        
+
         subgraph "Utilities"
-            Utils[Utils<br/>Logging & Helpers]
+            Utils["Utils<br/>Logging & Helpers"]
         end
     end
-    
+
     %% External Dependencies
-    STP[STP Solver<br/>Constraint Solver]
-    
+    STP["STP Solver<br/>Constraint Solver"]
+
+    %% Output
+    Results["Optimization Results<br/>Gate Circuits & Statistics"]
+
     %% Data Flow
     CLI --> GECOpt
     API --> GECOpt
     API --> BGCOpt
-    
+
     GECOpt --> SboxConverter
     GECOpt --> CVCGenerator
     GECOpt --> STPSolver
     GECOpt --> Utils
-    
+
     BGCOpt --> SboxConverter
     BGCOpt --> Utils
-    
+
     SboxConverter --> GECOpt
     SboxConverter --> BGCOpt
     CVCGenerator --> GateLibrary
     CVCGenerator --> STPSolver
     STPSolver --> STP
-    
-    %% Output
-    GECOpt --> Results[Optimization Results<br/>Gate Circuits & Statistics]
+
+    GECOpt --> Results
     BGCOpt --> Results
-    
+
     %% Styling
     classDef interface fill:#e1f5fe
     classDef core fill:#f3e5f5
     classDef external fill:#fff3e0
     classDef output fill:#e8f5e8
-    
+
     class CLI,API interface
     class GECOpt,BGCOpt,SboxConverter,CVCGenerator,GateLibrary,STPSolver,Utils core
     class STP external
@@ -82,6 +85,7 @@ graph TB
 ## Component Descriptions
 
 ### 1. **GECOptimizer** (`gec_optimizer.py`)
+
 - **Current Implementation**: Fully implemented GEC optimization
 - **Role**: Main orchestrator that coordinates the entire optimization process
 - **Responsibilities**:
@@ -94,19 +98,27 @@ graph TB
   - `optimize_sbox_exhaustive()` - Exhaustive search strategy
   - `find_all_solutions_for_gates()` - Exact gate count analysis
 
-### 2. **BGCOptimizer** (`bgc_optimizer.py`) - **Planned Addition**
-- **Future Implementation**: Boolean Gate Complexity optimization
-- **Role**: Optimizer for BGC-based S-box analysis
-- **Planned Responsibilities**:
-  - BGC-specific optimization workflows
-  - Boolean complexity analysis
-  - Integration with existing solver infrastructure
-- **Key Features** (Planned):
-  - Multiple BGC optimization strategies
-  - Boolean circuit analysis
-  - Cost optimization for boolean implementations
+### 2. **BGCOptimizer** (`bgc_optimizer.py`) - **Implemented**
+
+- **Current Implementation**: Boolean Gate Complexity optimization
+- **Role**: Optimizer for BGC-based S-box analysis focusing on minimal gate count
+- **Responsibilities**:
+  - BGC-specific optimization workflows with gate count minimization
+  - Boolean circuit structure generation and validation
+  - Integration with STP solver for constraint satisfaction
+  - Parallel and sequential solving strategies
+- **Key Features**:
+  - **BGCConstraintGenerator**: CVC constraint generation for Boolean gates
+  - **BGCCircuitStructure**: Circuit depth and gate distribution optimization
+  - **Multi-threading support**: Parallel solver execution
+  - **Structure validation**: Feasibility checking for circuit arrangements
+- **Key Methods**:
+  - `optimize_sbox()` - Main BGC optimization with configurable strategies
+  - `_solve_structure()` - Individual circuit structure solving
+  - `analyze_results()` - Result analysis and reporting
 
 ### 3. **SboxConverter** (`sbox_converter.py`)
+
 - **Role**: Handles S-box validation and bit-level decomposition
 - **Responsibilities**:
   - Validates S-box inputs (permutation checking)
@@ -118,6 +130,7 @@ graph TB
   - Bit decomposition for constraint generation
 
 ### 3. **CVCGenerator** (`cvc_generator.py`)
+
 - **Role**: Generates CVC format constraint files for the STP solver
 - **Responsibilities**:
   - Creates constraint satisfaction problems in CVC format
@@ -129,6 +142,7 @@ graph TB
   - Flexible circuit depth structures
 
 ### 4. **GateLibrary** (`gate_library.py`)
+
 - **Role**: Manages gate definitions and technology cost models
 - **Responsibilities**:
   - Defines supported gate types (XOR, AND, OR, NOT, etc.)
@@ -142,6 +156,7 @@ graph TB
   - Complex: XOR3, XNOR3, AND3, NAND3, OR3, NOR3, MAOI1, MOAI1
 
 ### 5. **STPSolver** (`stp_solver.py`)
+
 - **Role**: Interface to the STP constraint solver
 - **Responsibilities**:
   - Executes STP solver with generated CVC files
@@ -155,6 +170,7 @@ graph TB
   - Error handling and logging
 
 ### 6. **Utils** (`utils.py`)
+
 - **Role**: Provides utility functions and logging setup
 - **Responsibilities**:
   - Configurable logging system
@@ -168,18 +184,21 @@ graph TB
 ## Data Flow
 
 ### 1. **Input Processing**
+
 ```mermaid
 graph LR
     Input[S-box Input] --> Validate[Validation] --> Convert[Bit Conversion] --> Patterns[Generate xs/ys]
 ```
 
 ### 2. **Constraint Generation**
+
 ```mermaid
 graph LR
     Patterns[xs/ys Patterns] --> Structure[Generate Structure] --> Gates[Add Gate Constraints] --> CVC[CVC File]
 ```
 
 ### 3. **Solving Process**
+
 ```mermaid
 graph LR
     CVC[CVC File] --> STP[STP Solver] --> Parse[Parse Results] --> Analyze[Result Analysis]
@@ -190,21 +209,25 @@ graph LR
 The architecture supports multiple search strategies implemented in the `GECOptimizer`:
 
 ### 1. **Default Strategy**
+
 - Optimizes for minimal gate count
 - Stops on first satisfiable solution
 - Tests structures in decreasing gate count order
 
 ### 2. **Exhaustive Search**
+
 - Finds all possible solutions within constraints
 - Explores all depth structures for each gate count
 - Provides comprehensive solution space analysis
 
 ### 3. **Exact Gate Analysis**
+
 - Finds all solutions for a specific gate count
 - Useful for comparing structural alternatives
 - Provides detailed analysis of design trade-offs
 
 ### 4. **Structure Exploration**
+
 - Tests all depth structures systematically
 - Balances completeness with performance
 - More thorough than default, faster than exhaustive
@@ -220,26 +243,26 @@ graph TD
         Tech2[SMIC 130nm]
         Tech3[Future Technologies]
     end
-    
+
     subgraph "Gate Layer"
         Basic[Basic Gates]
         Complex[Complex Gates]
         Custom[Custom Gates]
     end
-    
+
     subgraph "Solver Layer"
         STP[STP Solver]
         Future[Future Solvers]
     end
-    
+
     GateLibrary --> Tech1
     GateLibrary --> Tech2
     GateLibrary --> Tech3
-    
+
     CVCGenerator --> Basic
     CVCGenerator --> Complex
     CVCGenerator --> Custom
-    
+
     STPSolver --> STP
     STPSolver --> Future
 ```
@@ -247,16 +270,19 @@ graph TD
 ## Performance Considerations
 
 ### **Parallel Processing**
+
 - Multi-threaded STP solver execution
 - Configurable thread count for different system capabilities
 - Optimal thread allocation for memory-constrained environments
 
 ### **Optimization Strategies**
+
 - Structure filtering before constraint solving
 - Gate count ordering (fewer gates prioritized)
 - Early termination for time-constrained scenarios
 
 ### **Memory Management**
+
 - Efficient constraint generation
 - Minimal memory footprint for large problems
 - Cleanup of temporary files and resources
