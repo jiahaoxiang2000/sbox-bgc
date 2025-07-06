@@ -21,7 +21,7 @@ def setup_logging(
     Returns:
         Configured logger instance
     """
-    logger = logging.getLogger("gec_solver")
+    logger = logging.getLogger("solver")
     logger.setLevel(getattr(logging, log_level.upper()))
 
     # Clear existing handlers
@@ -74,7 +74,7 @@ def ensure_directory(path: str) -> None:
     """
     if not os.path.exists(path):
         os.makedirs(path)
-        logging.getLogger("gec_solver").info(f"Created directory: {path}")
+        logging.getLogger("solver").info(f"Created directory: {path}")
 
 
 def get_timestamp() -> str:

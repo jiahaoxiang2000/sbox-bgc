@@ -1,10 +1,12 @@
 """
-GEC Solver Package for S-box Gate Equivalent Circuit optimization.
+Solver Package for S-box optimization using different methods.
 
 This package provides tools for:
-- Converting S-boxes to CVC format
-- Solving optimization problems using STP solver
-- Analyzing gate equivalent circuits
+- Gate Equivalent Circuit (GEC) optimization
+- Boolean Gate Complexity (BGC) optimization
+- Converting S-boxes to various constraint formats
+- Solving optimization problems using different solvers
+- Analyzing circuit implementations
 """
 
 from .sbox_converter import SboxConverter

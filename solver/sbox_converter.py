@@ -21,7 +21,7 @@ class SboxConverter:
         """
         self.bit_num = bit_num
         self.size = 2**bit_num
-        self.logger = logging.getLogger("gec_solver.sbox_converter")
+        self.logger = logging.getLogger("solver.sbox_converter")
 
         # Matrix for bit decomposition [bit_index][value_index]
         self.decomposition_matrix = [

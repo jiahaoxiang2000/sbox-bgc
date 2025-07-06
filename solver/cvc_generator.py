@@ -25,7 +25,7 @@ class CVCGenerator:
         """
         self.sbox_converter = sbox_converter
         self.gate_library = gate_library
-        self.logger = logging.getLogger("gec_solver.cvc_generator")
+        self.logger = logging.getLogger("solver.cvc_generator")
 
         self.bit_num = sbox_converter.bit_num
         self.size = sbox_converter.size

@@ -22,7 +22,7 @@ class GateLibrary:
     """
 
     def __init__(self):
-        self.logger = logging.getLogger("gec_solver.gate_library")
+        self.logger = logging.getLogger("solver.gate_library")
 
         # Gate types and their binary encodings
         self.gate_types = [

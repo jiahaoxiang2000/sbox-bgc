@@ -39,7 +39,7 @@ class STPSolver:
         """
         self.stp_path = stp_path
         self.timeout = timeout
-        self.logger = logging.getLogger("gec_solver.stp_solver")
+        self.logger = logging.getLogger("solver.stp_solver")
 
         # Verify STP is available
         if not self._check_stp_availability():
