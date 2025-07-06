@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **BGC (Boolean Gate Count) optimization framework** - Complete implementation with serial mode
+- **Formula generation tools** - BGC and GEC formula generators with LaTeX support
+- **Documentation** - Comprehensive usage examples and CLI reference for formula generators
+
 ## [1.0.0] - 2025-07-06 - Complete S-box Optimization Framework
 
 ### Added

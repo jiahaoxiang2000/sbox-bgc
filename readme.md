@@ -111,4 +111,76 @@ if bgc_results["best_solution"]:
 - Use when you have specific hardware constraints
 - Best for comparing different structures with same resource usage
 
+### **Formula Generation and Analysis**
+
+After optimization, you can generate readable Boolean formulas from the STP solver output using the included formula generators:
+
+#### GEC Formula Generation
+
+```bash
+# Generate human-readable formulas with cost analysis
+python utils/formula_gec.py gec_output/my_sbox/my_sbox_d_3_2_1.txt
+
+# Generate LaTeX format for academic papers
+python utils/formula_gec.py gec_output/my_sbox/my_sbox_d_3_2_1.txt --format latex
+
+# Show detailed variable assignments and gate costs
+python utils/formula_gec.py gec_output/my_sbox/my_sbox_d_3_2_1.txt --show-variables
+
+# Save to file and specify technology
+python utils/formula_gec.py gec_output/my_sbox/my_sbox_d_3_2_1.txt -o formulas.txt --technology 1
+```
+
+#### BGC Formula Generation
+
+```bash
+# Generate Boolean formulas with gate count analysis
+python utils/formula_bgc.py output_bgc/qarmav2/bgc_6_111111_0.txt
+
+# Generate LaTeX format with detailed analysis
+python utils/formula_bgc.py output_bgc/qarmav2/bgc_6_111111_0.txt --format latex --show-variables
+
+# Save analysis to file
+python utils/formula_bgc.py output_bgc/qarmav2/bgc_6_111111_0.txt -o bgc_analysis.txt
+```
+
+#### Formula Output Features
+
+Both formula generators provide:
+
+- **Execution Information**: Solver execution time, satisfiability status, timestamps
+- **Gate Analysis**: Gate count breakdown by type, circuit structure analysis
+- **Boolean Formulas**: Human-readable circuit equations (e.g., `T0 = X_0 XOR X_1`)
+- **LaTeX Support**: Mathematical notation for academic publications
+- **Cost Analysis**: Gate equivalent costs (GEC) or gate counts (BGC)
+
+#### Example Output
+
+```
+=== BGC Boolean Circuit Formula ===
+Source: bgc_6_111111_0.txt
+Format: human
+
+=== Execution Information ===
+Execution Time: 0.045s
+Result: SAT
+Success: True
+
+=== BGC Gate Count Analysis ===
+Optimization Method: BGC (Boolean Gate Count)
+Total Gates: 6
+
+Gate Count by Type:
+  XOR: 3
+  AND: 2
+  OR: 1
+
+BGC Circuit Formulas:
+  T0 = X_0 XOR X_1
+  T1 = X_2 AND T0
+  T2 = T1 OR X_3
+  Y0 = T2
+  Y1 = T0
+```
+
 For detailed documentation and advanced usage examples, see [example.md](docs/example.md).
