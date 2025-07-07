@@ -30,14 +30,14 @@ ANF Circuit Formulas:
   T7 = T_4 AND X_0
   T8 = X_1 OR T_7
   T9 = T_7 XOR X_1
-  T10 = ~T_0
+  T10 = NOT T_0
   T11 = T_4 XOR T_0
   T12 = T_7 AND X_3
   T13 = T_9 AND T_3
   T14 = T_6 OR T_13
   T15 = T_8 AND X_2
-  T16 = ~T_5
-  T17 = ~T_3
+  T16 = NOT T_5
+  T17 = NOT T_3
   T18 = T_11 XOR T_12
   T19 = T_15 OR T_17
   Y0 = T_16
