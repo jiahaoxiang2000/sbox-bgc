@@ -1,0 +1,46 @@
+=== ANF Boolean Circuit Formula ===
+Source: bgc_20_11111111111111111111_0.txt
+Format: human
+
+=== Execution Information ===
+Execution Time: 486.583s
+Result: SAT
+Success: True
+Timestamp: 2025-07-07_10-58-24
+
+=== ANF Gate Count Analysis ===
+Optimization Method: ANF (Algebraic Normal Form)
+Total Gates: 20
+Estimated Circuit Depth: 20
+
+Gate Count by Type:
+  AND: 6
+  OR: 5
+  XOR: 3
+  NOT: 6
+
+ANF Circuit Formulas:
+  T0 = X_0 AND X_1
+  T1 = X_0 AND X_2
+  T2 = X_2 OR T_0
+  T3 = X_0 OR X_3
+  T4 = X_3 OR X_1
+  T5 = T_2 AND T_3
+  T6 = T_2 XOR T_0
+  T7 = T_4 AND X_0
+  T8 = X_1 OR T_7
+  T9 = T_7 XOR X_1
+  T10 = ~T_0
+  T11 = T_4 XOR T_0
+  T12 = T_7 AND X_3
+  T13 = T_9 AND T_3
+  T14 = T_6 OR T_13
+  T15 = T_8 AND X_2
+  T16 = ~T_5
+  T17 = ~T_3
+  T18 = T_11 XOR T_12
+  T19 = T_15 OR T_17
+  Y0 = T_16
+  Y1 = T_19
+  Y2 = T_18
+  Y3 = T_14
