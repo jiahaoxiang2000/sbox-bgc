@@ -22,8 +22,8 @@ class BGCFormulaGenerator:
     def __init__(self):
         """Initialize the BGC formula generator."""
         
-        # BGC gate type mapping based on BGC encoding
-        # BGC uses 3-bit encoding as specified: B[2:0]
+        # BGC gate type mapping based on 3-bit encoding
+        # BGC uses 3-bit encoding: B[2:0]
         self.bgc_gate_types = {
             "0": "ZERO",      # 000 - Zero function
             "1": "NOT_Q0",    # 001 - ~Q_0 (NOT of first input)
@@ -33,6 +33,16 @@ class BGCFormulaGenerator:
             "5": "UNKNOWN_5", # 101 - Not defined in specification
             "6": "OR",        # 110 - Q_0 OR Q_1
             "7": "UNKNOWN_7", # 111 - Not defined in specification
+        }
+        
+        # ANF gate type mapping based on 4-bit encoding
+        # ANF uses 4-bit encoding: GTi[3:0]
+        self.anf_gate_types = {
+            "1": "AND",       # 0001 - Q2i ∧ Q2i+1
+            "6": "XOR",       # 0110 - Q2i ⊕ Q2i+1  
+            "7": "OR",        # 0111 - Q2i ∨ Q2i+1
+            "10": "NOT_Q1",   # 1010 - ~Q2i+1 (NOT of second input)
+            "12": "NOT_Q0",   # 1100 - ~Q2i (NOT of first input)
         }
 
         # LaTeX operators for BGC gates
@@ -129,6 +139,26 @@ class BGCFormulaGenerator:
 
         return arrays
 
+    def detect_gate_model(self, arrays: Dict[str, List[str]]) -> str:
+        """Detect which gate model was used based on B values."""
+        if "B" not in arrays:
+            return "bgc"  # Default to BGC if no B array found
+            
+        # Check if any B values use 4-bit ANF encoding
+        anf_values = {1, 6, 7, 10, 12}  # Valid ANF gate values
+        
+        for b_hex in arrays["B"]:
+            try:
+                b_val = int(b_hex, 16)
+                if b_val in anf_values:
+                    return "anf"
+                elif b_val > 7:  # Values > 7 indicate 4-bit encoding
+                    return "anf"
+            except ValueError:
+                continue
+                
+        return "bgc"
+
     def analyze_bgc_structure(self, arrays: Dict[str, List[str]]) -> Dict[str, Any]:
         """
         Analyze BGC circuit structure and gate count.
@@ -142,56 +172,71 @@ class BGCFormulaGenerator:
         if "B" not in arrays:
             return {"error": "No gate type information (B array) found"}
 
+        # Detect gate model
+        gate_model = self.detect_gate_model(arrays)
+        
         gate_analysis = []
         total_gates = len(arrays["B"])
         gate_count = {}
         
         try:
             for i, gate_type_hex in enumerate(arrays["B"]):
-                # Convert hex to BGC gate type
-                gate_type = self._decode_bgc_gate(gate_type_hex)
+                # Convert hex to gate type using detected model
+                gate_type = self._decode_gate(gate_type_hex, gate_model)
                 
                 gate_analysis.append({
                     "index": i,
                     "gate_type": gate_type,
                     "hex_value": gate_type_hex,
-                    "binary_encoding": self._hex_to_binary(gate_type_hex)
+                    "binary_encoding": self._hex_to_binary(gate_type_hex, gate_model)
                 })
                 
                 gate_count[gate_type] = gate_count.get(gate_type, 0) + 1
 
         except Exception as e:
-            return {"error": f"Error analyzing BGC structure: {e}"}
+            return {"error": f"Error analyzing structure: {e}"}
 
         # Calculate circuit depth if structure information is available
         circuit_depth = self._estimate_circuit_depth(arrays)
+        
+        model_name = "ANF (Algebraic Normal Form)" if gate_model == "anf" else "BGC (Boolean Gate Count)"
 
         return {
             "total_gates": total_gates,
             "gate_analysis": gate_analysis,
             "gate_count": gate_count,
             "circuit_depth": circuit_depth,
-            "optimization_method": "BGC (Boolean Gate Count)",
+            "optimization_method": model_name,
+            "gate_model": gate_model,
         }
 
-    def _decode_bgc_gate(self, hex_value: str) -> str:
-        """Decode BGC gate type from hex value using correct BGC encoding."""
+    def _decode_gate(self, hex_value: str, gate_model: str) -> str:
+        """Decode gate type from hex value using specified gate model."""
         try:
             int_val = int(hex_value, 16)
-            # Use only the lower 3 bits for BGC encoding B[2:0]
-            bgc_bits = int_val & 0x07
-            key = str(bgc_bits)
             
-            return self.bgc_gate_types.get(key, f"UNKNOWN_{hex_value}")
+            if gate_model == "anf":
+                # Use only the lower 4 bits for ANF encoding GTi[3:0]
+                bits = int_val & 0x0F
+                key = str(bits)
+                return self.anf_gate_types.get(key, f"UNKNOWN_{hex_value}")
+            else:  # bgc
+                # Use only the lower 3 bits for BGC encoding B[2:0]
+                bits = int_val & 0x07
+                key = str(bits)
+                return self.bgc_gate_types.get(key, f"UNKNOWN_{hex_value}")
                 
         except ValueError:
             return f"UNKNOWN_{hex_value}"
 
-    def _hex_to_binary(self, hex_value: str) -> str:
+    def _hex_to_binary(self, hex_value: str, gate_model: str = "bgc") -> str:
         """Convert hex value to binary representation."""
         try:
             int_val = int(hex_value, 16)
-            return f"0bin{int_val:03b}"
+            if gate_model == "anf":
+                return f"0bin{int_val:04b}"
+            else:  # bgc
+                return f"0bin{int_val:03b}"
         except ValueError:
             return f"INVALID_{hex_value}"
 
@@ -214,6 +259,9 @@ class BGCFormulaGenerator:
             print(f"Warning: Missing variable types: {missing}")
             return []
 
+        # Detect gate model
+        gate_model = self.detect_gate_model(arrays)
+        
         X, Y, B, T, Q = arrays["X"], arrays["Y"], arrays["B"], arrays["T"], arrays["Q"]
         formulas = []
 
@@ -222,7 +270,7 @@ class BGCFormulaGenerator:
             if i * 2 + 1 >= len(Q):
                 break
 
-            # BGC uses 2 Q variables per gate
+            # Both BGC and ANF use 2 Q variables per gate
             q1_idx = i * 2
             q2_idx = i * 2 + 1
             
@@ -233,11 +281,11 @@ class BGCFormulaGenerator:
                 q1_name = self._find_variable_name(q1, X, T, i)
                 q2_name = self._find_variable_name(q2, X, T, i)
 
-                # Get gate type
-                gate_type = self._decode_bgc_gate(gate_type_hex)
+                # Get gate type using detected model
+                gate_type = self._decode_gate(gate_type_hex, gate_model)
 
                 # Generate formula
-                formula = self._generate_bgc_gate_formula(
+                formula = self._generate_gate_formula(
                     i, gate_type, q1_name, q2_name, output_format
                 )
                 if formula:
@@ -272,7 +320,7 @@ class BGCFormulaGenerator:
                 return f"T_{index}"
         return f"VAR_{value}"
 
-    def _generate_bgc_gate_formula(
+    def _generate_gate_formula(
         self,
         index: int,
         gate_type: str,
@@ -336,8 +384,12 @@ class BGCFormulaGenerator:
         arrays = self.organize_variables(result_dict)
         formulas = self.generate_formulas(arrays, output_format)
 
+        # Detect gate model for title
+        gate_model = self.detect_gate_model(arrays)
+        title = f"{'ANF' if gate_model == 'anf' else 'BGC'} Boolean Circuit Formula"
+        
         lines = [
-            "=== BGC Boolean Circuit Formula ===",
+            f"=== {title} ===",
             f"Source: {os.path.basename(file_path)}",
             f"Format: {output_format}",
         ]
@@ -368,8 +420,9 @@ class BGCFormulaGenerator:
             if "error" in bgc_info:
                 lines.append(f"BGC Analysis Error: {bgc_info['error']}")
             else:
+                analysis_title = f"{'ANF' if bgc_info.get('gate_model') == 'anf' else 'BGC'} Gate Count Analysis"
                 lines.extend([
-                    "=== BGC Gate Count Analysis ===",
+                    f"=== {analysis_title} ===",
                     f"Optimization Method: {bgc_info['optimization_method']}",
                     f"Total Gates: {bgc_info['total_gates']}",
                 ])
@@ -403,7 +456,8 @@ class BGCFormulaGenerator:
             lines.append("")
 
         if formulas:
-            lines.append("BGC Circuit Formulas:")
+            formula_title = f"{'ANF' if gate_model == 'anf' else 'BGC'} Circuit Formulas"
+            lines.append(f"{formula_title}:")
             for formula in formulas:
                 lines.append(f"  {formula}")
         else:

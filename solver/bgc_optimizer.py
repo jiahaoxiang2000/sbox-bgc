@@ -33,10 +33,16 @@ class BGCResult:
 class BGCConstraintGenerator:
     """Generates CVC constraints for BGC optimization."""
 
-    def __init__(self, bit_num: int, logger: Optional[logging.Logger] = None):
+    def __init__(
+        self,
+        bit_num: int,
+        logger: Optional[logging.Logger] = None,
+        gate_model: str = "bgc",
+    ):
         self.bit_num = bit_num
         self.size = 2**bit_num
         self.logger = logger or logging.getLogger(__name__)
+        self.gate_model = gate_model
 
     def generate_variables(self, fout, gate_num: int, q_num: int, b_num: int) -> None:
         """Generate variable declarations for CVC file."""
@@ -113,8 +119,15 @@ class BGCConstraintGenerator:
 
         # Gate type constraints (B variables)
         for i in range(b_num):
-            x0 = "0bin0"
-            fout.write(f"ASSERT( B_{i}[2:2] & B_{i}[0:0] = {x0} );\n")
+            if self.gate_model == "anf":
+                # ANF 4-bit constraints: restrict to valid values 1,6,7,10,12
+                # Set upper bits to 0 if needed
+                # TODO not to limit gate types
+                pass
+            else:  # bgc
+                # BGC constraints: B[2] & B[0] = 0 (excludes 5=101 and 7=111)
+                x0 = "0bin0"
+                fout.write(f"ASSERT( B_{i}[2:2] & B_{i}[0:0] = {x0} );\n")
 
     def generate_gate_constraints(
         self,
@@ -199,15 +212,30 @@ class BGCConstraintGenerator:
     def _generate_gate_operation(
         self, fout, gate_idx: int, input1_idx: int, input2_idx: int, zero_vector: str
     ) -> None:
-        """Generate gate operation constraint using BGC encoding."""
-        constraint = (
-            f"ASSERT( T_{gate_idx} = BVXOR("
-            f"(IF B_{gate_idx}[2:2] =0bin1 THEN Q_{input1_idx} & Q_{input2_idx} ELSE {zero_vector} ENDIF), "
-            f"BVXOR("
-            f"(IF B_{gate_idx}[0:0]=0bin1 THEN ~Q_{input1_idx} ELSE {zero_vector} ENDIF), "
-            f"(IF B_{gate_idx}[1:1]=0bin1 THEN BVXOR( Q_{input1_idx}, Q_{input2_idx}) ELSE {zero_vector} ENDIF ) "
-            f") ) ); \n"
-        )
+        """Generate gate operation constraint using selected gate model."""
+        if self.gate_model == "anf":
+            # ANF gate module: Ti = GTi[3] + GTi[2]Q2i + GTi[1]Q2i+1 + GTi[0]Q2i+1 · Q2i
+            constraint = (
+                f"ASSERT( T_{gate_idx} = BVXOR("
+                f"BVXOR("
+                f"(IF B_{gate_idx}[3:3] =0bin1 THEN ~{zero_vector} ELSE {zero_vector} ENDIF), "
+                f"(IF B_{gate_idx}[2:2] =0bin1 THEN Q_{input1_idx} ELSE {zero_vector} ENDIF)"
+                f"), "
+                f"BVXOR("
+                f"(IF B_{gate_idx}[1:1] =0bin1 THEN Q_{input2_idx} ELSE {zero_vector} ENDIF), "
+                f"(IF B_{gate_idx}[0:0] =0bin1 THEN Q_{input1_idx} & Q_{input2_idx} ELSE {zero_vector} ENDIF)"
+                f") ) ); \n"
+            )
+        else:  # bgc
+            # Original BGC gate module: Ti = Fi f (B Bi [2], ∼ Q2i ) + Fi f (B Bi [1], Q2i + Q2i+1) + Fi f (B Bi [0], Q2i · Q2i+1)
+            constraint = (
+                f"ASSERT( T_{gate_idx} = BVXOR("
+                f"(IF B_{gate_idx}[2:2] =0bin1 THEN Q_{input1_idx} & Q_{input2_idx} ELSE {zero_vector} ENDIF), "
+                f"BVXOR("
+                f"(IF B_{gate_idx}[0:0]=0bin1 THEN ~Q_{input1_idx} ELSE {zero_vector} ENDIF), "
+                f"(IF B_{gate_idx}[1:1]=0bin1 THEN BVXOR( Q_{input1_idx}, Q_{input2_idx}) ELSE {zero_vector} ENDIF ) "
+                f") ) ); \n"
+            )
         fout.write(constraint)
 
     def generate_objective(self, fout) -> None:
@@ -293,6 +321,7 @@ class BGCOptimizer:
         log_level: str = "INFO",
         threads: int = 20,
         timeout: int = 300,
+        gate_model: str = "bgc",
     ):
         """
         Initialize BGC optimizer.
@@ -303,11 +332,19 @@ class BGCOptimizer:
             log_level: Logging level
             threads: Number of threads for parallel solving
             timeout: Solver timeout in seconds
+            gate_model: Gate model to use ("bgc" for 3-bit BGC, "anf" for 4-bit ANF)
         """
         self.bit_num = bit_num
         self.stp_path = stp_path
         self.threads = threads
         self.timeout = timeout
+
+        # Validate and store gate model
+        if gate_model not in ["bgc", "anf"]:
+            raise ValueError(
+                f"Invalid gate model: {gate_model}. Must be 'bgc' or 'anf'"
+            )
+        self.gate_model = gate_model
 
         # Setup logging
         self.logger = logging.getLogger(f"solver.bgc_optimizer")
@@ -315,7 +352,9 @@ class BGCOptimizer:
 
         # Initialize components
         self.sbox_converter = SboxConverter(bit_num)
-        self.constraint_generator = BGCConstraintGenerator(bit_num, self.logger)
+        self.constraint_generator = BGCConstraintGenerator(
+            bit_num, self.logger, self.gate_model
+        )
         self.circuit_structure = BGCCircuitStructure(bit_num, self.logger)
         self.stp_solver = STPSolver(stp_path, timeout)
 
@@ -581,7 +620,7 @@ class BGCOptimizer:
                 f.write(f"Gate Count: {gate_count}\n")
                 f.write(f"Circuit Depth: {len(structure)}\n")
                 f.write(f"Structure: {structure}\n")
-                
+
         except Exception as e:
             self.logger.error(f"Error appending BGC info to {result_file}: {e}")
 

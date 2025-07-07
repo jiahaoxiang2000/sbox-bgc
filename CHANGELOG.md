@@ -9,7 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **BGC (Boolean Gate Count) optimization framework** - Complete implementation with serial mode
-- **Formula generation tools** - BGC and GEC formula generators with LaTeX support
+- **ANF (Algebraic Normal Form) gate model** - 4-bit gate encoding with support for NOT, XOR, AND, OR operations
+- **Gate model selection** - CLI option `--gate-model` to choose between BGC (3-bit) and ANF (4-bit) encodings
+- **Dual constraint generation** - Support for both BGC and ANF gate operation formulas
+- **Formula generation tools** - BGC and GEC formula generators with LaTeX support and auto-detection
 - **Documentation** - Comprehensive usage examples and CLI reference for formula generators
 
 ## [1.0.0] - 2025-07-06 - Complete S-box Optimization Framework

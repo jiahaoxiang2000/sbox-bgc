@@ -103,6 +103,9 @@ Examples:
 
   # JSON output
   python bgc_cli.py --sbox "4,7,9,11,12,6,14,15,0,5,1,13,8,3,2,10" --bit-num 4 --json-output
+
+  # Use ANF gate model
+  python bgc_cli.py --sbox "0,1,3,6,7,4,5,2" --bit-num 3 --max-gates 10 --gate-model anf
         """,
     )
 
@@ -192,6 +195,14 @@ Examples:
         help="Number of threads for STP solver (default: 20)",
     )
 
+    parser.add_argument(
+        "--gate-model",
+        type=str,
+        choices=["bgc", "anf"],
+        default="bgc",
+        help="Gate model to use: 'bgc' for 3-bit BGC encoding, 'anf' for 4-bit ANF encoding (default: bgc)",
+    )
+
     # Logging options
     parser.add_argument(
         "--log-level",
@@ -237,6 +248,7 @@ Examples:
             log_level=args.log_level if not args.quiet else "ERROR",
             threads=args.threads,
             timeout=args.timeout,
+            gate_model=args.gate_model,
         )
 
         # Run optimization
