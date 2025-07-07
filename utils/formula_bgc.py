@@ -25,14 +25,14 @@ class BGCFormulaGenerator:
         # BGC gate type mapping based on BGC encoding
         # BGC uses 3-bit encoding as specified: B[2:0]
         self.bgc_gate_types = {
-            "00": "ZERO",      # 000 - Zero function
-            "01": "NOT_Q0",    # 001 - ~Q_0 (NOT of first input)
-            "02": "XOR",       # 010 - Q_0 XOR Q_1 
-            "03": "NOT_Q1",    # 011 - ~Q_1 (NOT of second input)
-            "04": "AND",       # 100 - Q_0 AND Q_1
-            "05": "UNKNOWN_5", # 101 - Not defined in specification
-            "06": "OR",        # 110 - Q_0 OR Q_1
-            "07": "UNKNOWN_7", # 111 - Not defined in specification
+            "0": "ZERO",      # 000 - Zero function
+            "1": "NOT_Q0",    # 001 - ~Q_0 (NOT of first input)
+            "2": "XOR",       # 010 - Q_0 XOR Q_1 
+            "3": "NOT_Q1",    # 011 - ~Q_1 (NOT of second input)
+            "4": "AND",       # 100 - Q_0 AND Q_1
+            "5": "UNKNOWN_5", # 101 - Not defined in specification
+            "6": "OR",        # 110 - Q_0 OR Q_1
+            "7": "UNKNOWN_7", # 111 - Not defined in specification
         }
 
         # LaTeX operators for BGC gates
@@ -178,11 +178,11 @@ class BGCFormulaGenerator:
         """Decode BGC gate type from hex value using correct BGC encoding."""
         try:
             int_val = int(hex_value, 16)
-            # Use only the lower 3 bits for BGC encoding
+            # Use only the lower 3 bits for BGC encoding B[2:0]
             bgc_bits = int_val & 0x07
-            hex_key = f"{bgc_bits:02X}"
+            key = str(bgc_bits)
             
-            return self.bgc_gate_types.get(hex_key, f"UNKNOWN_{hex_value}")
+            return self.bgc_gate_types.get(key, f"UNKNOWN_{hex_value}")
                 
         except ValueError:
             return f"UNKNOWN_{hex_value}"
