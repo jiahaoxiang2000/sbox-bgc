@@ -181,8 +181,8 @@ Examples:
     parser.add_argument(
         "--timeout",
         type=int,
-        default=300,
-        help="Solver timeout in seconds (default: 300)",
+        default=30000,
+        help="Solver timeout in seconds (default: 30000)",
     )
 
     parser.add_argument(
