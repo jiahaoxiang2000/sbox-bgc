@@ -2,7 +2,7 @@
 """
 BGC Formula generator for STP solver output.
 
-This script parses STP solver output from BGC optimization and generates 
+This script parses STP solver output from BGC optimization and generates
 readable Boolean formulas with gate count analysis.
 """
 
@@ -21,35 +21,35 @@ class BGCFormulaGenerator:
 
     def __init__(self):
         """Initialize the BGC formula generator."""
-        
+
         # BGC gate type mapping based on 3-bit encoding
         # BGC uses 3-bit encoding: B[2:0]
         self.bgc_gate_types = {
-            "0": "ZERO",      # 000 - Zero function
-            "1": "NOT_Q0",    # 001 - ~Q_0 (NOT of first input)
-            "2": "XOR",       # 010 - Q_0 XOR Q_1 
-            "3": "NOT_Q1",    # 011 - ~Q_1 (NOT of second input)
-            "4": "AND",       # 100 - Q_0 AND Q_1
-            "5": "UNKNOWN_5", # 101 - Not defined in specification
-            "6": "OR",        # 110 - Q_0 OR Q_1
-            "7": "UNKNOWN_7", # 111 - Not defined in specification
+            "0": "ZERO",  # 000 - Zero function
+            "1": "NOT_Q0",  # 001 - ~Q_0 (NOT of first input)
+            "2": "XOR",  # 010 - Q_0 XOR Q_1
+            "3": "NOT_Q1",  # 011 - ~Q_1 (NOT of second input)
+            "4": "AND",  # 100 - Q_0 AND Q_1
+            "5": "UNKNOWN_5",  # 101 - Not defined in specification
+            "6": "OR",  # 110 - Q_0 OR Q_1
+            "7": "UNKNOWN_7",  # 111 - Not defined in specification
         }
-        
+
         # ANF gate type mapping based on 4-bit encoding
         # ANF uses 4-bit encoding: GTi[3:0]
         self.anf_gate_types = {
-            "0": "ZERO",      # 0000 - Zero function
-            "1": "AND",       # 0001 - Q2i ∧ Q2i+1
-            "6": "XOR",       # 0110 - Q2i ⊕ Q2i+1  
-            "7": "OR",        # 0111 - Q2i ∨ Q2i+1
-            "10": "NOT_Q1",   # 1010 - ~Q2i+1 (NOT of second input)
-            "12": "NOT_Q0",   # 1100 - ~Q2i (NOT of first input)
+            "0": "ZERO",  # 0000 - Zero function
+            "1": "AND",  # 0001 - Q2i ∧ Q2i+1
+            "6": "XOR",  # 0110 - Q2i ⊕ Q2i+1
+            "7": "OR",  # 0111 - Q2i ∨ Q2i+1
+            "10": "NOT_Q1",  # 1010 - ~Q2i+1 (NOT of second input)
+            "12": "NOT_Q0",  # 1100 - ~Q2i (NOT of first input)
         }
 
         # LaTeX operators for BGC gates
         self.latex_ops = {
             "AND": "\\land",
-            "OR": "\\lor", 
+            "OR": "\\lor",
             "XOR": "\\oplus",
             "NOT": "\\sim",
             "NOT_Q0": "\\sim",
@@ -94,14 +94,14 @@ class BGCFormulaGenerator:
 
             for var_name, value in matches:
                 var_name = var_name.strip()
-                
+
                 # Convert binary values to hex for consistency
                 if value.startswith("0bin"):
                     binary_str = value[4:]  # Remove '0bin'
                     hex_value = f"{int(binary_str, 2):02X}"
                 else:
                     hex_value = value[2:].upper()  # Remove '0x'
-                    
+
                 result_dict[var_name] = hex_value
 
             # Add metadata to result
@@ -120,7 +120,7 @@ class BGCFormulaGenerator:
             # Skip metadata
             if var_name == "_metadata":
                 continue
-                
+
             # Extract variable type and index
             if "_" in var_name:
                 var_type, index_str = var_name.split("_", 1)
@@ -144,10 +144,10 @@ class BGCFormulaGenerator:
         """Detect which gate model was used based on B values."""
         if "B" not in arrays:
             return "bgc"  # Default to BGC if no B array found
-            
+
         # Check if any B values use 4-bit ANF encoding
         anf_values = {0, 1, 6, 7, 10, 12}  # Valid ANF gate values
-        
+
         for b_hex in arrays["B"]:
             try:
                 b_val = int(b_hex, 16)
@@ -157,16 +157,16 @@ class BGCFormulaGenerator:
                     return "anf"
             except ValueError:
                 continue
-                
+
         return "bgc"
 
     def analyze_bgc_structure(self, arrays: Dict[str, List[str]]) -> Dict[str, Any]:
         """
         Analyze BGC circuit structure and gate count.
-        
+
         Args:
             arrays: Organized variables from STP output
-            
+
         Returns:
             Dictionary containing BGC analysis results
         """
@@ -175,23 +175,27 @@ class BGCFormulaGenerator:
 
         # Detect gate model
         gate_model = self.detect_gate_model(arrays)
-        
+
         gate_analysis = []
         total_gates = len(arrays["B"])
         gate_count = {}
-        
+
         try:
             for i, gate_type_hex in enumerate(arrays["B"]):
                 # Convert hex to gate type using detected model
                 gate_type = self._decode_gate(gate_type_hex, gate_model)
-                
-                gate_analysis.append({
-                    "index": i,
-                    "gate_type": gate_type,
-                    "hex_value": gate_type_hex,
-                    "binary_encoding": self._hex_to_binary(gate_type_hex, gate_model)
-                })
-                
+
+                gate_analysis.append(
+                    {
+                        "index": i,
+                        "gate_type": gate_type,
+                        "hex_value": gate_type_hex,
+                        "binary_encoding": self._hex_to_binary(
+                            gate_type_hex, gate_model
+                        ),
+                    }
+                )
+
                 gate_count[gate_type] = gate_count.get(gate_type, 0) + 1
 
         except Exception as e:
@@ -199,8 +203,12 @@ class BGCFormulaGenerator:
 
         # Calculate circuit depth if structure information is available
         circuit_depth = self._estimate_circuit_depth(arrays)
-        
-        model_name = "ANF (Algebraic Normal Form)" if gate_model == "anf" else "BGC (Boolean Gate Count)"
+
+        model_name = (
+            "ANF (Algebraic Normal Form)"
+            if gate_model == "anf"
+            else "BGC (Boolean Gate Count)"
+        )
 
         return {
             "total_gates": total_gates,
@@ -215,7 +223,7 @@ class BGCFormulaGenerator:
         """Decode gate type from hex value using specified gate model."""
         try:
             int_val = int(hex_value, 16)
-            
+
             if gate_model == "anf":
                 # Use only the lower 4 bits for ANF encoding GTi[3:0]
                 bits = int_val & 0x0F
@@ -226,7 +234,7 @@ class BGCFormulaGenerator:
                 bits = int_val & 0x07
                 key = str(bits)
                 return self.bgc_gate_types.get(key, f"UNKNOWN_{hex_value}")
-                
+
         except ValueError:
             return f"UNKNOWN_{hex_value}"
 
@@ -243,7 +251,7 @@ class BGCFormulaGenerator:
 
     def _estimate_circuit_depth(self, arrays: Dict[str, List[str]]) -> Optional[int]:
         """Estimate circuit depth from variable dependencies."""
-        # This is a simplified estimation - actual depth would require 
+        # This is a simplified estimation - actual depth would require
         # analyzing the Q (input selection) variables
         if "T" in arrays and "Q" in arrays:
             # For BGC, depth is typically the number of gate levels
@@ -262,7 +270,7 @@ class BGCFormulaGenerator:
 
         # Detect gate model
         gate_model = self.detect_gate_model(arrays)
-        
+
         X, Y, B, T, Q = arrays["X"], arrays["Y"], arrays["B"], arrays["T"], arrays["Q"]
         formulas = []
 
@@ -274,7 +282,7 @@ class BGCFormulaGenerator:
             # Both BGC and ANF use 2 Q variables per gate
             q1_idx = i * 2
             q2_idx = i * 2 + 1
-            
+
             if q1_idx < len(Q) and q2_idx < len(Q):
                 q1, q2 = Q[q1_idx], Q[q2_idx]
 
@@ -343,7 +351,7 @@ class BGCFormulaGenerator:
         if gate_type == "NOT_Q0":  # 001: ~Q_0
             op = "\\sim" if output_format == "latex" else "NOT"
             return f"{t_var} = {op} {q1_var}"
-        elif gate_type == "NOT_Q1":  # 011: ~Q_1  
+        elif gate_type == "NOT_Q1":  # 011: ~Q_1
             op = "\\sim" if output_format == "latex" else "NOT"
             return f"{t_var} = {op} {q2_var}"
         elif gate_type == "XOR":  # 010: Q_0 XOR Q_1
@@ -387,8 +395,8 @@ class BGCFormulaGenerator:
 
         # Detect gate model for title
         gate_model = self.detect_gate_model(arrays)
-        title = f"{'ANF' if gate_model == 'anf' else 'BGC'} Boolean Circuit Formula"
-        
+        title = f"{'ANF' if gate_model == 'bgc' else 'BGC'} Boolean Circuit Formula"
+
         lines = [
             f"=== {title} ===",
             f"Source: {os.path.basename(file_path)}",
@@ -399,17 +407,17 @@ class BGCFormulaGenerator:
         if metadata:
             lines.append("")
             lines.append("=== Execution Information ===")
-            
+
             if "execution_time" in metadata:
                 lines.append(f"Execution Time: {metadata['execution_time']:.3f}s")
-                
+
             if "satisfiable" in metadata:
                 status = "SAT" if metadata["satisfiable"] else "UNSAT"
                 lines.append(f"Result: {status}")
-                
+
             if "success" in metadata:
                 lines.append(f"Success: {metadata['success']}")
-                
+
             if "timestamp" in metadata:
                 lines.append(f"Timestamp: {metadata['timestamp']}")
 
@@ -421,20 +429,25 @@ class BGCFormulaGenerator:
             if "error" in bgc_info:
                 lines.append(f"BGC Analysis Error: {bgc_info['error']}")
             else:
-                analysis_title = f"{'ANF' if bgc_info.get('gate_model') == 'anf' else 'BGC'} Gate Count Analysis"
-                lines.extend([
-                    f"=== {analysis_title} ===",
-                    f"Optimization Method: {bgc_info['optimization_method']}",
-                    f"Total Gates: {bgc_info['total_gates']}",
-                ])
-                
-                if bgc_info['circuit_depth']:
-                    lines.append(f"Estimated Circuit Depth: {bgc_info['circuit_depth']}")
-                
-                lines.extend([
-                    "",
-                    "Gate Count by Type:",
-                ])
+                analysis_title = f"{'ANF' if bgc_info.get('gate_model') == 'bgc' else 'BGC'} Gate Count Analysis"
+                lines.extend(
+                    [
+                        f"=== {analysis_title} ===",
+                        f"Total Gates: {bgc_info['total_gates']}",
+                    ]
+                )
+
+                if bgc_info["circuit_depth"]:
+                    lines.append(
+                        f"Estimated Circuit Depth: {bgc_info['circuit_depth']}"
+                    )
+
+                lines.extend(
+                    [
+                        "",
+                        "Gate Count by Type:",
+                    ]
+                )
 
                 for gate_type, count in sorted(bgc_info["gate_count"].items()):
                     lines.append(f"  {gate_type}: {count}")
@@ -457,7 +470,9 @@ class BGCFormulaGenerator:
             lines.append("")
 
         if formulas:
-            formula_title = f"{'ANF' if gate_model == 'anf' else 'BGC'} Circuit Formulas"
+            formula_title = (
+                f"{'ANF' if gate_model == 'bgc' else 'BGC'} Circuit Formulas"
+            )
             lines.append(f"{formula_title}:")
             for formula in formulas:
                 lines.append(f"  {formula}")

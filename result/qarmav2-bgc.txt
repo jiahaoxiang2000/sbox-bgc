@@ -1,4 +1,4 @@
-=== ANF Boolean Circuit Formula ===
+=== BGC Boolean Circuit Formula ===
 Source: bgc_20_11111111111111111111_0.txt
 Format: human
 
@@ -8,8 +8,7 @@ Result: SAT
 Success: True
 Timestamp: 2025-07-10_17-17-25
 
-=== ANF Gate Count Analysis ===
-Optimization Method: ANF (Algebraic Normal Form)
+=== BGC Gate Count Analysis ===
 Total Gates: 20
 Estimated Circuit Depth: 20
 
@@ -19,7 +18,7 @@ Gate Count by Type:
   OR: 6
   XOR: 6
 
-ANF Circuit Formulas:
+BGC Circuit Formulas:
   T0 = X_1 AND X_0
   T1 = NOT X_1
   T2 = X_0 XOR T_1
