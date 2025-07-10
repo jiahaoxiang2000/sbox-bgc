@@ -120,10 +120,10 @@ class BGCConstraintGenerator:
         # Gate type constraints (B variables)
         for i in range(b_num):
             if self.gate_model == "anf":
-                # ANF 4-bit constraints: restrict to valid values 1,6,7,10,12
+                # ANF 4-bit constraints: restrict to valid values 0,1,6,7,10,12
                 # Use OR constraints to limit B_i[0:3] to these specific values
                 fout.write(
-                    f"ASSERT( ( B_{i}[3:0] = 0bin0001 ) OR ( B_{i}[3:0] = 0bin0110 ) OR ( B_{i}[3:0] = 0bin0111 ) OR ( B_{i}[3:0] = 0bin1010 ) OR ( B_{i}[3:0] = 0bin1100 ) );\n"
+                    f"ASSERT( ( B_{i}[3:0] = 0bin0000 ) OR ( B_{i}[3:0] = 0bin0001 ) OR ( B_{i}[3:0] = 0bin0110 ) OR ( B_{i}[3:0] = 0bin0111 ) OR ( B_{i}[3:0] = 0bin1010 ) OR ( B_{i}[3:0] = 0bin1100 ) );\n"
                 )
             else:  # bgc
                 # BGC constraints: B[2] & B[0] = 0 (excludes 5=101 and 7=111)

@@ -38,6 +38,7 @@ class BGCFormulaGenerator:
         # ANF gate type mapping based on 4-bit encoding
         # ANF uses 4-bit encoding: GTi[3:0]
         self.anf_gate_types = {
+            "0": "ZERO",      # 0000 - Zero function
             "1": "AND",       # 0001 - Q2i ∧ Q2i+1
             "6": "XOR",       # 0110 - Q2i ⊕ Q2i+1  
             "7": "OR",        # 0111 - Q2i ∨ Q2i+1
@@ -145,7 +146,7 @@ class BGCFormulaGenerator:
             return "bgc"  # Default to BGC if no B array found
             
         # Check if any B values use 4-bit ANF encoding
-        anf_values = {1, 6, 7, 10, 12}  # Valid ANF gate values
+        anf_values = {0, 1, 6, 7, 10, 12}  # Valid ANF gate values
         
         for b_hex in arrays["B"]:
             try:
