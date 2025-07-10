@@ -14,10 +14,10 @@ Total Gates: 20
 Estimated Circuit Depth: 20
 
 Gate Count by Type:
-  AND: 6
-  OR: 5
-  XOR: 3
-  NOT: 6
+  AND: 7
+  OR: 6
+  XOR: 4
+  NOT: 3
 
 ANF Circuit Formulas:
   T0 = X_0 AND X_1
