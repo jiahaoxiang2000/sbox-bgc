@@ -395,7 +395,7 @@ class BGCFormulaGenerator:
 
         # Detect gate model for title
         gate_model = self.detect_gate_model(arrays)
-        title = f"{'ANF' if gate_model == 'bgc' else 'BGC'} Boolean Circuit Formula"
+        title = f"{'ANF' if gate_model == 'anf' else 'BGC'} Boolean Circuit Formula"
 
         lines = [
             f"=== {title} ===",
@@ -429,7 +429,7 @@ class BGCFormulaGenerator:
             if "error" in bgc_info:
                 lines.append(f"BGC Analysis Error: {bgc_info['error']}")
             else:
-                analysis_title = f"{'ANF' if bgc_info.get('gate_model') == 'bgc' else 'BGC'} Gate Count Analysis"
+                analysis_title = f"{'ANF' if bgc_info.get('gate_model') == 'anf' else 'BGC'} Gate Count Analysis"
                 lines.extend(
                     [
                         f"=== {analysis_title} ===",
@@ -471,7 +471,7 @@ class BGCFormulaGenerator:
 
         if formulas:
             formula_title = (
-                f"{'ANF' if gate_model == 'bgc' else 'BGC'} Circuit Formulas"
+                f"{'ANF' if gate_model == 'anf' else 'BGC'} Circuit Formulas"
             )
             lines.append(f"{formula_title}:")
             for formula in formulas:
