@@ -145,19 +145,31 @@ class BGCFormulaGenerator:
         if "B" not in arrays:
             return "bgc"  # Default to BGC if no B array found
 
-        # Check if any B values use 4-bit ANF encoding
-        anf_values = {0, 1, 6, 7, 10, 12}  # Valid ANF gate values
+        # Check for ANF-specific values that don't exist in BGC
+        anf_only_values = {10, 12}  # Values that only exist in ANF (1010, 1100)
+        has_anf_only = False
+        max_value = 0
 
         for b_hex in arrays["B"]:
             try:
                 b_val = int(b_hex, 16)
-                if b_val in anf_values:
-                    return "anf"
-                elif b_val > 7:  # Values > 7 indicate 4-bit encoding
+                max_value = max(max_value, b_val)
+
+                # If we find values that only exist in ANF 4-bit encoding
+                if b_val in anf_only_values:
+                    has_anf_only = True
+                    break
+                elif b_val > 7:  # Values > 7 definitely indicate 4-bit encoding
                     return "anf"
             except ValueError:
                 continue
 
+        # If we found ANF-only values, it's definitely ANF
+        if has_anf_only:
+            return "anf"
+
+        # If all values are ≤ 7, it's BGC (3-bit encoding)
+        # Even if some values overlap with ANF, BGC takes precedence for ≤ 7
         return "bgc"
 
     def analyze_bgc_structure(self, arrays: Dict[str, List[str]]) -> Dict[str, Any]:
