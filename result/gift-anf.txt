@@ -1,0 +1,36 @@
+=== ANF Boolean Circuit Formula ===
+Source: bgc_11_11111111111_0.txt
+Format: human
+
+=== Execution Information ===
+Execution Time: 60.154s
+Result: SAT
+Success: True
+Timestamp: 2025-07-12_16-41-59
+
+=== ANF Gate Count Analysis ===
+Total Gates: 11
+Estimated Circuit Depth: 11
+
+Gate Count by Type:
+  AND: 3
+  NOT_Q1: 1
+  OR: 1
+  XOR: 6
+
+ANF Circuit Formulas:
+  T0 = X_1 AND X_3
+  T1 = T_0 XOR X_2
+  T2 = T_1 AND X_0
+  T3 = T_2 XOR X_3
+  T4 = X_3 OR T_1
+  T5 = X_1 XOR T_4
+  T6 = T_5 XOR X_0
+  T7 = NOT T_6
+  T8 = T_1 XOR T_6
+  T9 = T_3 AND T_8
+  T10 = T_5 XOR T_9
+  Y0 = T3
+  Y1 = T10
+  Y2 = T8
+  Y3 = T7
