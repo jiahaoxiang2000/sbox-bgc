@@ -1,0 +1,38 @@
+=== BGC Boolean Circuit Formula ===
+Source: bgc_13_1111111111111_0.txt
+Format: human
+
+=== Execution Information ===
+Execution Time: 37.005s
+Result: SAT
+Success: True
+Timestamp: 2025-07-13_09-13-55
+
+=== BGC Gate Count Analysis ===
+Total Gates: 13
+Estimated Circuit Depth: 13
+
+Gate Count by Type:
+  AND: 3
+  OR: 2
+  XOR: 8
+
+BGC Circuit Formulas:
+  T0 = X_0 XOR X_1
+  T1 = X_2 XOR X_3
+  T2 = X_2 OR X_1
+  T3 = X_3 AND T_1
+  T4 = X_4 OR X_0
+  T5 = X_3 XOR X_4
+  T6 = T_3 XOR X_1
+  T7 = X_4 AND T_5
+  T8 = T_4 XOR T_5
+  T9 = X_1 AND T_0
+  T10 = T_2 XOR T_0
+  T11 = X_2 XOR T_7
+  T12 = T_9 XOR X_4
+  Y0 = T10
+  Y1 = T6
+  Y2 = T11
+  Y3 = T8
+  Y4 = T12
